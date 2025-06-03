@@ -28,7 +28,7 @@ export default function SignupPage() {
     return
   }
 
-  // Insert or update profile in your 'profiles' table
+  // Insert or update profile in 'profiles' table
   const { error: profileError } = await supabase.from('profiles').upsert({
     id: data.user.id,
     name,
@@ -40,7 +40,7 @@ export default function SignupPage() {
     return
   }
 
-  // Optional: sign out immediately after signup
+
   await supabase.auth.signOut()
   router.push('/signin')
 }

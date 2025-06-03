@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function About() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-teal-100 px-6 sm:px-16 py-16 font-sans text-gray-900 relative overflow-hidden">
-      {/* Background accent circles */}
+ 
       <div className="absolute top-[-100px] left-[-100px] w-72 h-72 bg-teal-300 rounded-full opacity-20 blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-[-80px] right-[-80px] w-96 h-96 bg-teal-400 rounded-full opacity-15 blur-3xl pointer-events-none"></div>
 
