@@ -21,12 +21,8 @@ A collaborative habit-tracking app where users form clans (groups), check in dai
 - **Frontend:** Next.js (App Router), React  
 - **Styling:** Tailwind CSS  
 - **Backend/Database:** Supabase (PostgreSQL, Auth, Realtime)  
-- **Icons:** Lucide Icons  
-
----
-
-## 📁 Folder Structure
-
+- **Icons:** Lucide Icons
+  
 ```
 
 ## 🧪 Local Development
