@@ -38,7 +38,7 @@ export async function POST(req) {
       )
     }
 
-    
+    // Insert new check-in record
     const { data, error: insertError } = await supabase
       .from('check_ins')
       .insert([{ user_id, habit_id, group_id, date, status: checkInStatus }])
