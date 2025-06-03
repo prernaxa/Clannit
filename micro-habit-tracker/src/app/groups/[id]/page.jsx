@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import useUser from '@/lib/useUser'
-import { Users, AlertCircle, PlusCircle, Plus, ThumbsUp } from 'lucide-react'
+import { Users, AlertCircle, Plus, ThumbsUp } from 'lucide-react'
 
 export default function GroupDetailPage() {
   const user = useUser()
@@ -14,8 +14,9 @@ export default function GroupDetailPage() {
 
   const [group, setGroup] = useState(null)
   const [members, setMembers] = useState([])
-  const [suggestions, setSuggestions] = useState([])
+  const [suggestionsWithUser, setSuggestionsWithUser] = useState([])
   const [newSuggestion, setNewSuggestion] = useState('')
+  const [newSuggestionTargetUserId, setNewSuggestionTargetUserId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [voting, setVoting] = useState(null)
 
@@ -46,10 +47,18 @@ export default function GroupDetailPage() {
         .eq('group_id', groupId)
         .order('votes', { ascending: false })
 
+      if (suggestionsError) {
+        console.error('Error fetching suggestions:', suggestionsError)
+      }
+
       const { data: memberData, error: memberError } = await supabase
         .from('user_groups')
         .select('user_id, profiles(name)')
         .eq('group_id', groupId)
+
+      if (memberError) {
+        console.error('Error fetching members:', memberError)
+      }
 
       const { data: checkinsData, error: checkinsError } = await supabase
         .from('check_ins')
@@ -61,6 +70,10 @@ export default function GroupDetailPage() {
         `)
         .eq('group_id', groupId)
 
+      if (checkinsError) {
+        console.error('Error fetching check-ins:', checkinsError)
+      }
+
       const membersWithCheckins = (memberData ?? []).map(m => ({
         id: m.user_id,
         name: m.profiles?.name || 'Unknown',
@@ -68,8 +81,33 @@ export default function GroupDetailPage() {
       }))
 
       setGroup(groupData)
-      setSuggestions(suggestionsData ?? [])
       setMembers(membersWithCheckins)
+
+      const targetUserIds = [...new Set((suggestionsData ?? []).map(s => s.target_user_id).filter(Boolean))]
+
+      let assignedUsersMap = {}
+      if (targetUserIds.length > 0) {
+        const { data: assignedUsers, error: assignedUsersError } = await supabase
+          .from('profiles')
+          .select('id, name')
+          .in('id', targetUserIds)
+
+        if (assignedUsersError) {
+          console.error('Error fetching assigned users:', assignedUsersError)
+        } else {
+          assignedUsersMap = assignedUsers.reduce((acc, user) => {
+            acc[user.id] = user.name
+            return acc
+          }, {})
+        }
+      }
+
+      const suggestionsWithUserName = (suggestionsData ?? []).map(s => ({
+        ...s,
+        assignedUserName: s.target_user_id ? (assignedUsersMap[s.target_user_id] || 'Unknown User') : 'Unassigned',
+      }))
+
+      setSuggestionsWithUser(suggestionsWithUserName)
       setLoading(false)
     }
 
@@ -90,7 +128,7 @@ export default function GroupDetailPage() {
     })
 
     if (res.ok) {
-      setSuggestions((prev) =>
+      setSuggestionsWithUser((prev) =>
         prev.map((s) =>
           s.id === suggestionId ? { ...s, votes: s.votes + 1 } : s
         )
@@ -103,19 +141,23 @@ export default function GroupDetailPage() {
   }
 
   const handleSuggest = async () => {
-    if (!newSuggestion.trim()) return
+    if (!newSuggestion.trim() || !newSuggestionTargetUserId) {
+      alert('Please select a user who missed a habit to assign this penalty.')
+      return
+    }
 
     const { error } = await supabase.from('penalty_suggestions').insert([{
       group_id: groupId,
       suggested_by: user.id,
       text: newSuggestion.trim(),
       votes: 0,
+      target_user_id: newSuggestionTargetUserId,
     }])
 
     if (error) {
       alert(error.message)
     } else {
-      setSuggestions((prev) => [
+      setSuggestionsWithUser((prev) => [
         ...prev,
         {
           id: Date.now(),
@@ -123,15 +165,18 @@ export default function GroupDetailPage() {
           suggested_by: user.id,
           text: newSuggestion.trim(),
           votes: 0,
+          target_user_id: newSuggestionTargetUserId,
+          assignedUserName: members.find(m => m.id === newSuggestionTargetUserId)?.name || 'Unknown',
         },
       ])
       setNewSuggestion('')
+      setNewSuggestionTargetUserId(null)
     }
   }
 
   if (!user) {
     return (
-      <div className="flex justify-center items-center h-screen text-teal-700 text-lg font-semibold">
+      <div className="flex justify-center items-center h-screen text-gray-600 text-xl font-medium">
         Please login to view this group.
       </div>
     )
@@ -139,7 +184,7 @@ export default function GroupDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen text-teal-400 text-lg font-light animate-pulse">
+      <div className="flex justify-center items-center h-screen text-gray-400 text-lg font-light animate-pulse">
         Loading...
       </div>
     )
@@ -147,139 +192,125 @@ export default function GroupDetailPage() {
 
   if (!group) {
     return (
-      <div className="flex justify-center items-center h-screen text-teal-700 text-lg font-semibold">
+      <div className="flex justify-center items-center h-screen text-gray-700 text-lg font-semibold">
         Group not found.
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-teal-50 to-teal-100 p-6 flex justify-center">
-      <div className="max-w-5xl w-full bg-white rounded-3xl shadow-lg border border-teal-200 p-10">
-        <h1 className="text-5xl font-extrabold text-teal-900 mb-12 tracking-wide drop-shadow-sm">
-          {group.name}
-        </h1>
+    <div className="min-h-screen bg-gradient-to-tr from-white to-teal-100 py-10 px-4 md:px-10">
+      <div className="max-w-6xl mx-auto bg-white rounded-3xl shadow-xl p-8 md:p-12 space-y-16">
+        <h1 className="text-4xl md:text-5xl font-bold text-teal-900 tracking-tight">{group.name}</h1>
 
-        {/* Group Members & Habits */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-semibold text-teal-800 mb-6 border-b border-teal-300 pb-3 flex items-center gap-3">
-            <Users size={32} className="text-teal-600" />
-            Group Members & Habits
+        {/* Members Section */}
+        <section>
+          <h2 className="text-2xl md:text-3xl font-semibold text-teal-800 flex items-center gap-2 mb-6">
+            <Users /> Group Members & Habits
           </h2>
           {members.length === 0 ? (
-            <p className="text-teal-400 italic text-lg">No members found in this group.</p>
+            <p className="text-gray-400 italic">No members found in this group.</p>
           ) : (
-            members.map((member) => (
-              <div
-                key={member.id}
-                className="mb-8 p-6 bg-teal-50 rounded-2xl shadow-inner border border-teal-100"
-              >
-                <h3 className="text-2xl font-semibold text-teal-900 mb-5">{member.name}</h3>
-                <ul className="ml-6 space-y-3">
-                  {member.checkins.length === 0 ? (
-                    <li className="text-teal-300 italic text-lg">No habits tracked yet.</li>
-                  ) : (
-                    member.checkins.map((checkin, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-center justify-between bg-white p-4 rounded-xl shadow-md border border-teal-100"
-                      >
-                        <span className="text-teal-700 font-semibold">
-                          {checkin.check_ins_habit_id_fkey?.name || 'Habit'}
-                        </span>
-
-                        {checkin.status === 'missed' ? (
-                          <button
-                            onClick={() => {
-                              suggestionFormRef.current?.scrollIntoView({ behavior: 'smooth' })
-                            }}
-                            className="text-white bg-red-600 hover:bg-red-700 transition px-5 py-2 rounded-full text-sm font-semibold shadow-lg shadow-red-300 flex items-center gap-2"
-                            aria-label="Suggest Penalty"
-                          >
-                            <Plus size={16} />
-                            Suggest Penalty
-                          </button>
-                        ) : (
-                          <span className="text-green-600 font-semibold text-sm tracking-wide">
-                            Completed
+            <div className="space-y-8">
+              {members.map((member) => (
+                <div key={member.id} className="bg-teal-50 p-6 rounded-2xl border border-teal-100 shadow-sm">
+                  <h3 className="text-xl font-semibold text-teal-900 mb-3">{member.name}</h3>
+                  <ul className="space-y-3">
+                    {member.checkins.length === 0 ? (
+                      <li className="text-gray-400 italic">No habits tracked yet.</li>
+                    ) : (
+                      member.checkins.map((checkin, idx) => (
+                        <li key={idx} className="flex items-center justify-between bg-white p-3 rounded-xl border shadow">
+                          <span className="text-teal-700 font-medium">
+                            {checkin.check_ins_habit_id_fkey?.name || 'Habit'}
                           </span>
-                        )}
-                      </li>
-                    ))
-                  )}
-                </ul>
-              </div>
-            ))
+                          {checkin.status === 'missed' ? (
+                            <button
+                              onClick={() => {
+                                setNewSuggestionTargetUserId(member.id)
+                                suggestionFormRef.current?.scrollIntoView({ behavior: 'smooth' })
+                              }}
+                              className="flex items-center gap-1 text-red-600 hover:text-red-800 font-semibold"
+                            >
+                              <AlertCircle size={20} />
+                              Missed
+                            </button>
+                          ) : (
+                            <span className="text-green-600 flex items-center gap-1">
+                              <ThumbsUp size={20} /> Completed
+                            </span>
+                          )}
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                </div>
+              ))}
+            </div>
           )}
         </section>
 
-        {/* Penalty Suggestions */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-semibold text-teal-800 mb-6 border-b border-teal-300 pb-3 flex items-center gap-3">
-            <AlertCircle size={32} className="text-teal-600" />
-            Penalty Suggestions
+        {/* Suggestions Section */}
+        <section>
+          <h2 className="text-2xl md:text-3xl font-semibold text-teal-800 flex items-center gap-2 mb-6">
+            <AlertCircle /> Penalty Suggestions
           </h2>
-          {suggestions.length === 0 ? (
-            <p className="text-teal-400 italic text-lg">No suggestions yet. Be the first to suggest!</p>
+
+          {suggestionsWithUser.length === 0 ? (
+            <p className="text-gray-400 italic mb-6">No penalty suggestions yet.</p>
           ) : (
-            <ul className="space-y-6">
-              {suggestions.map((s) => (
+            <ul className="space-y-4 mb-8">
+              {suggestionsWithUser.map((s) => (
                 <li
                   key={s.id}
-                  className="bg-white rounded-3xl p-6 shadow-md border border-teal-100 flex flex-col sm:flex-row sm:justify-between sm:items-center"
+                  className="bg-white border border-teal-200 p-4 rounded-xl shadow flex justify-between items-center"
                 >
-                  <p className="text-teal-900 text-lg font-medium mb-5 sm:mb-0">{s.text}</p>
-                  <div className="flex items-center gap-6">
-                    <span className="text-teal-600 font-semibold select-none text-base">
-                      Votes: {s.votes}
-                    </span>
-                    <button
-                      onClick={() => handleVote(s.id)}
-                      disabled={voting === s.id}
-                      className={`px-6 py-2 rounded-3xl font-semibold transition shadow flex items-center gap-2 ${
-                        voting === s.id
-                          ? 'bg-teal-300 cursor-not-allowed text-white'
-                          : 'bg-teal-700 hover:bg-teal-800 text-white shadow-teal-500/50'
-                      }`}
-                      aria-label={`Vote for penalty suggestion: ${s.text}`}
-                    >
-                      <ThumbsUp size={16} />
-                      {voting === s.id ? 'Voting...' : 'Vote'}
-                    </button>
+                  <div>
+                    <p className="text-teal-800 font-medium">{s.text}</p>
+                    <p className="text-sm text-gray-500">Assigned to: {s.assignedUserName}</p>
                   </div>
+                  <button
+                    onClick={() => handleVote(s.id)}
+                    disabled={voting === s.id}
+                    className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg disabled:opacity-50"
+                  >
+                    Vote ({s.votes})
+                  </button>
                 </li>
               ))}
             </ul>
           )}
-        </section>
 
-        {/* Suggest a new penalty */}
-        <section ref={suggestionFormRef}>
-          <h2 className="text-3xl font-semibold text-teal-800 mb-6 border-b border-teal-300 pb-3 flex items-center gap-3">
-            <PlusCircle size={32} className="text-teal-600" />
-            Suggest a New Penalty
-          </h2>
-          <textarea
-            value={newSuggestion}
-            onChange={(e) => setNewSuggestion(e.target.value)}
-            className="w-full border border-teal-300 rounded-3xl p-6 mb-8 shadow-sm focus:outline-none focus:ring-4 focus:ring-teal-400 focus:border-transparent transition resize-none text-teal-900 placeholder-teal-400 text-lg"
-            placeholder="e.g., 30 push-ups, donate ₹50..."
-            rows={5}
-            maxLength={150}
-          />
-          <button
-            onClick={handleSuggest}
-            disabled={!newSuggestion.trim()}
-            className={`w-full py-5 rounded-3xl font-semibold text-white text-lg transition shadow-md flex items-center justify-center gap-3 ${
-              newSuggestion.trim()
-                ? 'bg-teal-600 hover:bg-teal-700 shadow-teal-600/50'
-                : 'bg-teal-300 cursor-not-allowed'
-            }`}
-            aria-label="Submit penalty suggestion"
-          >
-            <Plus size={20} />
-            Submit Suggestion
-          </button>
+          {/* Suggestion Form */}
+          <div ref={suggestionFormRef} className="space-y-4">
+            <h3 className="text-xl font-semibold text-teal-700">Suggest a New Penalty</h3>
+            <textarea
+              className="w-full border border-teal-600 rounded-xl p-3"
+              rows={3}
+              placeholder="Enter your penalty suggestion..."
+              value={newSuggestion}
+              onChange={(e) => setNewSuggestion(e.target.value)}
+            />
+            <select
+              className="w-full border text-gray-500 border-teal-600 rounded-xl p-3"
+              value={newSuggestionTargetUserId || ''}
+              onChange={(e) => setNewSuggestionTargetUserId(e.target.value)}
+            >
+              <option value="">Assign to a user who missed a habit</option>
+              {members
+                .filter(m => m.checkins.some(c => c.status === 'missed'))
+                .map(m => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+            </select>
+            <button
+              onClick={handleSuggest}
+              className="bg-teal-700 hover:bg-teal-800 text-white font-medium px-6 py-2 rounded-xl"
+            >
+              <Plus className="inline-block mr-1 mb-1" size={18} />
+              Submit Suggestion
+            </button>
+          </div>
         </section>
       </div>
     </div>

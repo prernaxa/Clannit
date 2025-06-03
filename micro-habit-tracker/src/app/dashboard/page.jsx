@@ -10,6 +10,8 @@ import {
   Plus,
   Users,
   LogIn,
+  Heart,
+  
 } from 'lucide-react'
 
 export default function DashboardPage() {
@@ -139,6 +141,7 @@ export default function DashboardPage() {
   }
 
   return (
+    <>
     <main className="max-w-5xl mx-auto px-6 py-12 space-y-10 bg-white rounded-lg shadow-lg">
       <div className="flex items-center gap-4">
         <UserCircle className="w-10 h-10 text-teal-600" />
@@ -245,5 +248,10 @@ export default function DashboardPage() {
       </section>
       
     </main>
+    <footer className="mt-32 py-10 border-t border-gray-300 text-center text-sm text-gray-500 flex justify-center items-center gap-2 z-10 relative">
+        © 2025 Clannit. Made with <Heart className="w-5 h-5 text-teal-600" /> and good habits.
+      </footer>
+    </>
+    
   )
 }
