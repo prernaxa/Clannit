@@ -11,10 +11,10 @@ export async function POST(req) {
       )
     }
 
-    // Optional: Validate status (e.g. 'done', 'missed', etc.)
+    
     const checkInStatus = status || 'done'
 
-    // Check if check-in for this user + habit or group + date already exists
+   
     let filter = supabase
       .from('check_ins')
       .select('*')
@@ -27,7 +27,6 @@ export async function POST(req) {
     const { data: existing, error: fetchError } = await filter.limit(1).single()
 
     if (fetchError && fetchError.code !== 'PGRST116') {
-      // PGRST116 = no rows found, which is fine here
       return new Response(JSON.stringify({ error: fetchError.message }), { status: 500 })
     }
 
@@ -38,7 +37,6 @@ export async function POST(req) {
       )
     }
 
-    // Insert new check-in record
     const { data, error: insertError } = await supabase
       .from('check_ins')
       .insert([{ user_id, habit_id, group_id, date, status: checkInStatus }])
