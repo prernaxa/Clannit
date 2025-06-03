@@ -1,4 +1,4 @@
-# 🌱 Clannit – Build Tiny Habits with Your Social Circle
+# 📅 Clannit – Build Tiny Habits with Your Social Circle
 
 A collaborative habit-tracking app where users form clans (groups), check in daily for their habits, and suggest penalties for missed check-ins. Penalties can be voted on by other members — fostering accountability and a little fun!
 
