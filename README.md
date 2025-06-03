@@ -49,13 +49,13 @@ npm install
 - Create a Supabase project at [https://supabase.com](https://supabase.com)
 - Enable **Authentication** and **PostgreSQL**
 - Create the following tables:  
-  `groups`, `user_groups`, `penalty_suggestions`, `check_ins`, `profiles`, `habits`, `penalties`, `penalty votes`
+  `groups`, `user_groups`, `penalty_suggestions`, `check_ins`, `profiles`, `habits`, `penalties`, `penalty_votes`
 - You can find the SQL schema in `/supabase/schema.sql`  
   (Let me know if you want help writing the schema.)
 
 ### 4. Configure environment variables
 
-Create a `.env.local` file and add the following:
+Create a `.env.local` file in the root directory and add the following:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
@@ -79,12 +79,6 @@ Visit [http://localhost:3000](http://localhost:3000) to view the app.
 - [ ] Leaderboard for most consistent users  
 - [ ] Reminder system (email or in-app)  
 - [ ] Mobile-first improvements  
-
----
-
-## 📄 License
-
-This project is open-source and available under the [MIT License](LICENSE).
 
 ---
 
