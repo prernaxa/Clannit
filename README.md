@@ -74,7 +74,6 @@ Visit [http://localhost:3000](http://localhost:3000) to view the app.
 - [ ] Show check-in streaks  
 - [ ] Leaderboard for most consistent users  
 - [ ] Reminder system (email or in-app)  
-- [ ] Mobile-first improvements  
 
 ---
 
