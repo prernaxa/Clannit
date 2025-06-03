@@ -1,22 +1,22 @@
-# 📅 Clannit – Build Tiny Habits with Your Social Circle
+# Clannit – Build Tiny Habits with Your Social Circle
 
 A collaborative habit-tracking app where users form clans (groups), check in daily for their habits, and suggest penalties for missed check-ins. Penalties can be voted on by other members — fostering accountability and a little fun!
 
 ---
 
-## 🚀 Features
+## Features
 
-- ✅ **User Authentication** via Supabase  
-- 👥 **Group Creation & Joining**  
-- ✉️ **Invite Friends via Invite Code**  
-- 📆 **Habit Tracking & Daily Check-ins**  
-- ⚠️ **Penalty Suggestions** for missed check-ins  
-- 🗳️ **Voting System** for penalty suggestions  
-- 📊 **Group Overview** with habits and check-in status  
+- **User Authentication** via Supabase  
+- **Group Creation & Joining**  
+- **Invite Friends via Invite Code**  
+- **Habit Tracking & Daily Check-ins**  
+- **Penalty Suggestions** for missed check-ins  
+- **Voting System** for penalty suggestions  
+- **Group Overview** with habits and check-in status  
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Frontend:** Next.js (App Router), React  
 - **Styling:** Tailwind CSS  
@@ -25,7 +25,7 @@ A collaborative habit-tracking app where users form clans (groups), check in dai
   
 ---
 
-## 🧪 Local Development
+## Local Development
 
 ### 1. Clone the repository
 
@@ -68,15 +68,6 @@ Visit [http://localhost:3000](http://localhost:3000) to view the app.
 
 ---
 
-## ✅ To-Do
-
-- [ ] Add penalty notification system  
-- [ ] Show check-in streaks  
-- [ ] Leaderboard for most consistent users  
-- [ ] Reminder system (email or in-app)  
-
----
-
-## 🙌 Contributing
+## Contributing
 
 Pull requests and suggestions are welcome! Feel free to fork the repo and improve it.
