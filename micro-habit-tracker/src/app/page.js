@@ -11,11 +11,15 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-teal-50 px-6 sm:px-12 py-10 font-sans flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-white to-teal-100 px-6 sm:px-12 py-10 font-sans flex flex-col">
       {/* Top Nav */}
       <nav className="w-full max-w-7xl mx-auto flex items-center justify-between mb-16">
         <div className="flex items-center gap-3">
-          <Calendar size={32} className="text-teal-700" />
+        
+         
+           <div className="p-2 rounded-full bg-teal-100 group-hover:bg-teal-200 transition">
+            <Calendar size={30} className="text-teal-700" />
+          </div>
           <span className="text-2xl font-bold tracking-tight text-teal-800">Clannit</span>
         </div>
         <div className="flex gap-4">

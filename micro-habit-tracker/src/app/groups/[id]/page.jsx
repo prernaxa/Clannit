@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import useUser from '@/lib/useUser'
-import { Users, AlertCircle, Plus, ThumbsUp } from 'lucide-react'
+import { Users, AlertCircle, Plus, ThumbsUp, ArrowLeft } from 'lucide-react'
 
 export default function GroupDetailPage() {
   const user = useUser()
@@ -200,6 +200,14 @@ export default function GroupDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-tr from-white to-teal-100 py-10 px-4 md:px-10">
+    {/* Back to Dashboard Button */}
+      <button
+        onClick={() => router.push('/dashboard')}
+        className="mb-6 flex items-center gap-2 text-teal-700 hover:text-teal-900 font-medium transition"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        Back to Dashboard
+      </button>
       <div className="max-w-6xl mx-auto bg-white rounded-3xl shadow-xl p-8 md:p-12 space-y-16">
         <h1 className="text-4xl md:text-5xl font-bold text-teal-900 tracking-tight">{group.name}</h1>
 

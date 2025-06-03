@@ -1,5 +1,5 @@
 'use client'
-
+import Header from '@/components/Header'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
@@ -10,7 +10,7 @@ import {
   Plus,
   Users,
   LogIn,
-  Heart,
+  Repeat,
   
 } from 'lucide-react'
 
@@ -141,8 +141,11 @@ export default function DashboardPage() {
   }
 
   return (
-    <>
-    <main className="max-w-5xl mx-auto px-6 py-12 space-y-10 bg-white rounded-lg shadow-lg">
+      <>
+     <Header userName={userName || user?.email} />
+     
+  
+    <main className="mt-8  mb-8 max-w-5xl mx-auto px-6 py-12 space-y-10 bg-gradient-to-br from-white to-teal-100 rounded-lg shadow-lg">
       <div className="flex items-center gap-4">
         <UserCircle className="w-10 h-10 text-teal-600" />
         <h1 className="text-3xl font-bold text-teal-800">
@@ -153,7 +156,7 @@ export default function DashboardPage() {
       {/* HABITS */}
       <section className="bg-white border border-teal-200 rounded-2xl shadow-md p-6">
         <div className="flex items-center gap-3 mb-4">
-          <ListTodo className="w-6 h-6 text-teal-500" />
+          <Repeat className="w-6 h-6 text-teal-500" />
           <h2 className="text-xl font-semibold text-teal-700">Your Micro-Habits</h2>
         </div>
 
@@ -240,7 +243,7 @@ export default function DashboardPage() {
           </button>
           <button
             onClick={() => router.push('/groups/join')}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-teal-400 text-white rounded-xl hover:bg-teal-500 transition"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-xl hover:bg-teal-500 transition"
           >
             <LogIn size={18} /> Join Group
           </button>
@@ -248,10 +251,7 @@ export default function DashboardPage() {
       </section>
       
     </main>
-    <footer className="mt-32 py-10 border-t border-gray-300 text-center text-sm text-gray-500 flex justify-center items-center gap-2 z-10 relative">
-        © 2025 Clannit. Made with <Heart className="w-5 h-5 text-teal-600" /> and good habits.
-      </footer>
-    </>
     
+    </>
   )
 }

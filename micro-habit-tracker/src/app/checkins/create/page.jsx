@@ -90,7 +90,7 @@ export default function CreateCheckin() {
   if (!user) return <p className="p-4">Loading...</p>
 
   return (
-    <div className="max-w-md mx-auto mt-12 p-8 bg-white rounded-lg shadow-lg border border-teal-200">
+    <div className=" mb-8 max-w-md mx-auto mt-12 p-8 bg-white rounded-lg shadow-lg border border-teal-200">
       <h1 className="text-3xl font-extrabold text-teal-700 mb-8 text-center">Create Check-In</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">

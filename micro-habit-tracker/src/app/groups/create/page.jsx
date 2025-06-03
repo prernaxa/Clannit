@@ -111,5 +111,6 @@ export default function CreateGroupPage() {
         </div>
       </div>
     </div>
+    
   )
 }
