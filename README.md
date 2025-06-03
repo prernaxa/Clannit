@@ -23,7 +23,7 @@ A collaborative habit-tracking app where users form clans (groups), check in dai
 - **Backend/Database:** Supabase (PostgreSQL, Auth, Realtime)  
 - **Icons:** Lucide Icons
   
-```
+---
 
 ## 🧪 Local Development
 
