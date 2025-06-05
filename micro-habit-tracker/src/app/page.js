@@ -1,3 +1,4 @@
+'use client'
 import {
   UserPlus,
   LogIn,
@@ -9,6 +10,24 @@ import {
   Calendar,
 } from "lucide-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 100 } },
+  hover: { scale: 1.05, boxShadow: "0 10px 20px rgba(0,0,0,0.12)" },
+};
 
 export default function Home() {
   return (
@@ -38,7 +57,12 @@ export default function Home() {
       </nav>
 
       {/* Hero */}
-      <header className="px-6 sm:px-12 py-12 text-center sm:text-left max-w-5xl mx-auto mb-24 mt-14">
+      <motion.header
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="px-6 sm:px-12 py-12 text-center sm:text-left max-w-5xl mx-auto mb-20 mt-14"
+      >
         <h1 className="text-5xl sm:text-6xl font-extrabold leading-tight tracking-tight mb-6">
           Tiny habits, <span className="text-teal-600">big results</span>.
         </h1>
@@ -59,7 +83,7 @@ export default function Home() {
             Learn More
           </a>
         </div>
-      </header>
+      </motion.header>
 
       {/* Why Clannit */}
       <section id="why" className="py-24 bg-teal-50 px-6 sm:px-12">
@@ -69,7 +93,12 @@ export default function Home() {
             Most habit apps rely on motivation. Clannit relies on real people. You build one small habit in a fun group, and the social push keeps you going.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-3 gap-12"
+          >
             {[
               {
                 Icon: Sparkles,
@@ -87,15 +116,20 @@ export default function Home() {
                 desc: "Missed your habit? Expect silly penalties from your team.",
               },
             ].map(({ Icon, title, desc }) => (
-              <div key={title} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition text-left">
+              <motion.div
+                key={title}
+                variants={cardVariants}
+                whileHover="hover"
+                className="bg-white rounded-xl shadow-md p-6 text-left cursor-pointer"
+              >
                 <div className="flex items-center gap-4 mb-4">
                   <Icon className="text-teal-600 w-10 h-10 p-2 bg-teal-100 rounded-full" />
                   <h3 className="text-xl font-semibold">{title}</h3>
                 </div>
                 <p className="text-gray-700">{desc}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -106,24 +140,44 @@ export default function Home() {
           <p className="text-xl text-gray-700 mb-10">
             We believe real change comes from small wins and social accountability. Clannit makes habit-building less lonely, more joyful, and way more effective.
           </p>
-          <CheckCircle className="w-10 h-10 text-teal-600 mx-auto mb-3 animate-bounce" />
+          <motion.div
+            animate={{ scale: [1, 1.1, 1], rotate: [0, 10, -10, 0] }}
+            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+            className="mx-auto mb-3 w-10 h-10 text-teal-600"
+          >
+            <CheckCircle />
+          </motion.div>
           <p className="text-sm italic text-gray-500">Built by people who’ve skipped gym day too.</p>
         </div>
       </section>
 
       {/* Call to Action */}
       <section className="text-center pb-24">
-        <Link
-          href="/signup"
-          className="inline-block bg-teal-600 text-white px-10 py-4 rounded-full font-semibold text-lg hover:bg-teal-700 transition transform hover:scale-105 shadow-lg"
+        <motion.div
+          whileHover={{ scale: 1.05, boxShadow: "0 10px 20px rgba(0,0,0,0.2)" }}
+          transition={{ type: "spring", stiffness: 300 }}
+          className="inline-block"
         >
-          Join Clannit Today
-        </Link>
+          <Link
+            href="/signup"
+            className="bg-teal-600 text-white px-10 py-4 rounded-full font-semibold text-lg hover:bg-teal-700 transition transform shadow-lg"
+          >
+            Join Clannit Today
+          </Link>
+        </motion.div>
       </section>
 
       {/* Footer */}
       <footer className="py-10 border-t border-gray-200 text-center text-sm text-gray-500 flex justify-center items-center gap-1">
-        © 2025 Clannit. Made with <Heart className="w-4 h-4 text-teal-600" /> and tiny habits.
+        © 2025 Clannit. Made with{" "}
+        <motion.div
+          animate={{ scale: [1, 1.3, 1], rotate: [0, 15, -15, 0] }}
+          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+          className="inline-block"
+        >
+          <Heart className="w-4 h-4 text-teal-600 inline-block" />
+        </motion.div>{" "}
+        and tiny habits.
       </footer>
     </div>
   );
